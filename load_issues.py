@@ -1,8 +1,8 @@
 from ingest.github_client import fetch_issues
 from ingest.normalize import to_document
 from ingest.db import ensure_indexes, upsert_issues, issues
+from ingest.config import REPOS
 
-REPOS = ["axios/axios", "facebook/react", "TanStack/query"]
 ISSUES_PER_REPO = 1000
 
 ensure_indexes()
