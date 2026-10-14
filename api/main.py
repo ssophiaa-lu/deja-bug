@@ -16,7 +16,7 @@ async def lifespan(app):
     yield
 
 
-app = FastAPI(title="IssueLens API", lifespan=lifespan)
+app = FastAPI(title="Déjà Bug API", lifespan=lifespan)
 
 
 class SearchRequest(BaseModel):

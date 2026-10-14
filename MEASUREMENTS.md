@@ -1,4 +1,4 @@
-# IssueLens Measurements
+# Déjà Bug Measurements
 
 ## Oct 11, 2026: After loading issues (before embeddings)
 
