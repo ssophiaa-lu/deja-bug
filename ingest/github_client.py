@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 from dotenv import load_dotenv
 
@@ -9,6 +10,23 @@ HEADERS = {
     "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
     "Accept": "application/vnd.github+json",
 }
+MAX_ATTEMPTS = 4
+RETRY_STATUS_CODES = {429, 500, 502, 503, 504}  # temporary: trying again may work
+
+
+def get_with_retries(url, params):
+    """GET a GitHub URL, retrying temporary failures after waiting 1s, 2s, then 4s."""
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            response = requests.get(url, headers=HEADERS, params=params, timeout=30)
+        except (requests.ConnectionError, requests.Timeout):
+            if attempt == MAX_ATTEMPTS:
+                raise  # out of tries: let the error stop the sync
+        else:  # runs only if requests.get didn't raise
+            if response.status_code not in RETRY_STATUS_CODES or attempt == MAX_ATTEMPTS:
+                response.raise_for_status()  # 401, 404, ... fail right away: retrying won't help
+                return response
+        time.sleep(2 ** (attempt - 1))  # 1s, 2s, 4s
 
 
 def fetch_issues(repo, max_issues=1000, since=None):
@@ -26,8 +44,7 @@ def fetch_issues(repo, max_issues=1000, since=None):
 
     count = 0
     while url and (max_issues is None or count < max_issues):
-        response = requests.get(url, headers=HEADERS, params=params, timeout=30)
-        response.raise_for_status()  # stop with an error if GitHub says something went wrong
+        response = get_with_retries(url, params)
 
         for item in response.json():
             if "pull_request" in item:  # this endpoint mixes in PRs; skip them
