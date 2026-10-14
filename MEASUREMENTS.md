@@ -52,5 +52,6 @@ so a fixed similarity cutoff can't separate them. A threshold needs measured
 data (Step 9).
 
 ## Open items
-- [ ] Update repo name facebook/react → react/react and re-run load (no re-embedding needed)
+- [x] Update repo name facebook/react → react/react and re-run load (no re-embedding needed).
+  One stale facebook/react issue (#24136) fell outside the new top-1,000 window and was deleted.
 - [ ] Turn the three test queries above into evaluation cases in Step 9
