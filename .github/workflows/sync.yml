@@ -1,0 +1,34 @@
+name: Sync issues
+
+on:
+  schedule:
+    - cron: "0 9 * * *"  # every day at 09:00 UTC
+  workflow_dispatch:      # adds a "Run workflow" button on GitHub
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip  # reuse downloaded packages between runs
+
+      - run: pip install -r requirements.txt
+
+      - name: Download changed issues
+        run: python sync.py
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # temporary token GitHub creates for each run
+
+      - name: Embed issues whose text changed
+        run: python embed_issues.py
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
