@@ -12,7 +12,8 @@ HEADERS = {
 
 
 def fetch_issues(repo, max_issues=1000, since=None):
-    """Yield issues (not pull requests) from a repo, most recently updated first."""
+    """Yield issues (not pull requests) from a repo, most recently updated first.
+    max_issues=None means no limit."""
     url = f"{API_URL}/repos/{repo}/issues"
     params = {
         "state": "all",        # open AND closed issues
@@ -21,10 +22,10 @@ def fetch_issues(repo, max_issues=1000, since=None):
         "direction": "desc",
     }
     if since:
-        params["since"] = since  # only issues updated after this time (used in Step 6)
+        params["since"] = since  # only issues updated at or after this time
 
     count = 0
-    while url and count < max_issues:
+    while url and (max_issues is None or count < max_issues):
         response = requests.get(url, headers=HEADERS, params=params, timeout=30)
         response.raise_for_status()  # stop with an error if GitHub says something went wrong
 
@@ -33,7 +34,7 @@ def fetch_issues(repo, max_issues=1000, since=None):
                 continue
             yield item
             count += 1
-            if count >= max_issues:
+            if max_issues is not None and count >= max_issues:
                 return
 
         # GitHub tells us where the next page is in the response headers
