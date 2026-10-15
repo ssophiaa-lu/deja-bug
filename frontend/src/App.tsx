@@ -3,12 +3,15 @@ import { fetchRepos, searchIssues, type SearchFilters, type SearchResult } from 
 import SearchForm from './components/SearchForm'
 import ResultCard from './components/ResultCard'
 
+const SLOW_SEARCH_MS = 5000
+
 function App() {
   const [repos, setRepos] = useState<string[]>([])
   // null means "hasn't searched yet", which is different from "searched and found nothing"
   const [results, setResults] = useState<SearchResult[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [slow, setSlow] = useState(false) // true once a search has taken longer than SLOW_SEARCH_MS
 
   // Runs once when the page first loads: fill the repo dropdown
   useEffect(() => {
@@ -21,18 +24,25 @@ function App() {
   async function handleSearch(query: string, filters: SearchFilters) {
     setError(null)
     setLoading(true)
+    // A normal search is well under a second; a long wait almost always means the free server is waking up
+    const slowTimer = setTimeout(() => setSlow(true), SLOW_SEARCH_MS)
     try {
       setResults(await searchIssues(query, filters))
     } catch (err) {
       setResults(null) // don't leave old results looking like answers to the new search
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
-      setLoading(false) // runs whether the search worked or failed
+      // runs whether the search worked or failed
+      clearTimeout(slowTimer)
+      setSlow(false)
+      setLoading(false)
     }
   }
 
   let statusMessage = ''
-  if (results && results.length === 0) {
+  if (loading && slow) {
+    statusMessage = 'Waking up the server. On the free plan this can take up to a minute…'
+  } else if (results && results.length === 0) {
     statusMessage = 'No matching issues. Try describing the problem differently, or remove a filter.'
   } else if (results) {
     statusMessage = results.length === 1 ? '1 result' : `${results.length} results`
