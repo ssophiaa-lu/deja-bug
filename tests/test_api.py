@@ -67,6 +67,16 @@ def test_limit_too_large_is_rejected():
     assert client.post("/search", json={"query": "timeout", "limit": 500}).status_code == 422
 
 
+def test_frontend_origin_is_allowed():
+    response = client.get("/health", headers={"Origin": "http://localhost:5173"})
+    assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
+
+
+def test_other_origin_is_not_allowed():
+    response = client.get("/health", headers={"Origin": "https://some-other-site.com"})
+    assert "access-control-allow-origin" not in response.headers
+
+
 def test_database_error_returns_503(monkeypatch):
     def broken_search(*args):
         raise PyMongoError("connection lost")

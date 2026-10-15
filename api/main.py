@@ -1,7 +1,9 @@
+import os
 from contextlib import asynccontextmanager
 from typing import Literal, Optional
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 from pymongo.errors import PyMongoError
 
@@ -17,6 +19,19 @@ async def lifespan(app):
 
 
 app = FastAPI(title="Déjà Bug API", lifespan=lifespan)
+
+# Websites allowed to call this API from a browser, comma-separated.
+# Defaults to the local React dev server; the deployed site's address is set on Render.
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],  # the frontend sends JSON to /search
+)
 
 
 class SearchRequest(BaseModel):
