@@ -27,10 +27,16 @@ main {
   padding: 8px;
 }
 
-.search-form button {
-  align-self: flex-start;
+.search-controls {
+  display: flex;
+  flex-wrap: wrap; /* on a narrow phone screen, controls drop to the next line */
+  gap: 8px;
+}
+
+.search-controls select,
+.search-controls button {
   font: inherit;
-  padding: 6px 16px;
+  padding: 6px 12px;
 }
 
 .results {

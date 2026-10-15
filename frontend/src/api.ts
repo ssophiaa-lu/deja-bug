@@ -22,11 +22,21 @@ export async function fetchRepos(): Promise<string[]> {
   return data.repos
 }
 
-export async function searchIssues(query: string): Promise<SearchResult[]> {
+// Same choices as the API's Literal["open", "closed"]
+export type IssueState = 'open' | 'closed'
+
+// Leave a filter out (undefined) to search everything
+export type SearchFilters = {
+  repo?: string
+  state?: IssueState
+}
+
+export async function searchIssues(query: string, filters: SearchFilters = {}): Promise<SearchResult[]> {
   const response = await fetch(`${API_URL}/search`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
+    // JSON.stringify drops undefined fields, so unset filters aren't sent at all
+    body: JSON.stringify({ query, ...filters }),
   })
   if (!response.ok) {
     throw new Error(`POST /search failed with status ${response.status}`)
