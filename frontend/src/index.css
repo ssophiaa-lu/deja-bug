@@ -15,3 +15,52 @@ main {
 .error {
   color: #cf222e;
 }
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.search-form textarea {
+  font: inherit;
+  padding: 8px;
+}
+
+.search-form button {
+  align-self: flex-start;
+  font: inherit;
+  padding: 6px 16px;
+}
+
+.results {
+  list-style: none;
+  padding: 0;
+}
+
+.result-card {
+  padding: 12px 0;
+  border-bottom: 1px solid #d0d7de;
+}
+
+.result-meta {
+  font-size: 0.85em;
+  color: #59636e;
+}
+
+.label {
+  margin-left: 6px;
+  padding: 0 6px;
+  border: 1px solid #d0d7de;
+  border-radius: 999px;
+}
+
+.result-title {
+  font-weight: 600;
+}
+
+.result-preview {
+  margin: 4px 0 0;
+  color: #59636e;
+  overflow-wrap: anywhere; /* long error text and URLs wrap instead of widening the page */
+}
