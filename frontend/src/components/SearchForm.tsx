@@ -3,10 +3,11 @@ import type { IssueState, SearchFilters } from '../api'
 
 type Props = {
   repos: string[]
+  loading: boolean
   onSearch: (query: string, filters: SearchFilters) => void
 }
 
-function SearchForm({ repos, onSearch }: Props) {
+function SearchForm({ repos, loading, onSearch }: Props) {
   const [query, setQuery] = useState('')
   const [repo, setRepo] = useState('') // '' means all repos
   const [state, setState] = useState<IssueState | ''>('') // '' means open and closed
@@ -46,7 +47,10 @@ function SearchForm({ repos, onSearch }: Props) {
           <option value="open">Open only</option>
           <option value="closed">Closed only</option>
         </select>
-        <button type="submit">Search</button>
+        {/* Disabled while loading, so double-clicks can't start two racing searches */}
+        <button type="submit" disabled={loading}>
+          {loading ? 'Searching…' : 'Search'}
+        </button>
       </div>
     </form>
   )

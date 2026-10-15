@@ -31,15 +31,29 @@ export type SearchFilters = {
   state?: IssueState
 }
 
+// Turn an error status into a message a visitor can understand
+function searchErrorMessage(status: number): string {
+  if (status === 503) return 'Search is temporarily unavailable. Please try again.'
+  if (status === 422) return "That search couldn't be processed. Try rewording it."
+  return `Something went wrong (error ${status}).`
+}
+
+// Throws an Error whose message is ready to show on the page
 export async function searchIssues(query: string, filters: SearchFilters = {}): Promise<SearchResult[]> {
-  const response = await fetch(`${API_URL}/search`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    // JSON.stringify drops undefined fields, so unset filters aren't sent at all
-    body: JSON.stringify({ query, ...filters }),
-  })
+  let response: Response
+  try {
+    response = await fetch(`${API_URL}/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // JSON.stringify drops undefined fields, so unset filters aren't sent at all
+      body: JSON.stringify({ query, ...filters }),
+    })
+  } catch {
+    // fetch only throws when there's no response at all: server down, no internet, or CORS blocked
+    throw new Error("Can't reach the Déjà Bug server. Check your connection and try again.")
+  }
   if (!response.ok) {
-    throw new Error(`POST /search failed with status ${response.status}`)
+    throw new Error(searchErrorMessage(response.status))
   }
   const data: { results: SearchResult[] } = await response.json()
   return data.results

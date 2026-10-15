@@ -39,6 +39,12 @@ main {
   padding: 6px 12px;
 }
 
+.status {
+  min-height: 1.5em; /* reserve the line so results don't jump when a message appears */
+  margin: 16px 0 0;
+  color: #59636e;
+}
+
 .results {
   list-style: none;
   padding: 0;
