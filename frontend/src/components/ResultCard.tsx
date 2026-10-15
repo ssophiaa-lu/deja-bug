@@ -8,7 +8,10 @@ function ResultCard({ result }: Props) {
   return (
     <li className="result-card">
       <div className="result-meta">
-        {result.repo} #{result.number} · {result.state}
+        <span className={`badge badge-${result.state}`}>{result.state === 'open' ? 'Open' : 'Closed'}</span>
+        <span>
+          {result.repo} #{result.number}
+        </span>
         {result.labels.map((label) => (
           <span key={label} className="label">
             {label}

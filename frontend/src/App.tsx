@@ -40,10 +40,16 @@ function App() {
 
   return (
     <main>
-      <h1>Déjà Bug</h1>
-      <p>Have I seen this bug before?</p>
+      <header className="header">
+        <h1>Déjà Bug</h1>
+        <p className="tagline">Have I seen this bug before?</p>
+        <p className="intro">
+          Searches 3,000+ GitHub issues from popular open-source projects by meaning, not keywords, so an
+          issue worded differently from yours still turns up.
+        </p>
+      </header>
 
-      <SearchForm repos={repos} loading={loading} onSearch={handleSearch} />
+      <SearchForm repos={repos} loading={loading} showExamples={results === null} onSearch={handleSearch} />
 
       {/* aria-live: screen readers announce these messages when they change */}
       <p className="status" aria-live="polite">
@@ -62,6 +68,12 @@ function App() {
           ))}
         </ul>
       )}
+
+      <footer className="footer">
+        <a href="https://github.com/ssophiaa-lu/deja-bug" target="_blank" rel="noopener noreferrer">
+          Source on GitHub
+        </a>
+      </footer>
     </main>
   )
 }
